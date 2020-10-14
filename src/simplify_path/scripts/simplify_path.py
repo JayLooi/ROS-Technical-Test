@@ -49,7 +49,7 @@ class SimplifyPath:
         rospy.init_node('simplify_path')
         self.pose_arr = PoseArray()
         self.pose_arr.header.frame_id = 'map-2'
-        
+        self.new_messages = []
         self.topic_list = []
         self.topic = None
         with rosbag.Bag(self.in_bag_fp) as bag:
@@ -147,7 +147,7 @@ class SimplifyPath:
         
         if self.N < n:
             rospy.logwarn(  'For epsilon of %f, the path can only be compressed to minimum of %d waypoints. '   \
-                            'Try increasing the epsilon values to obtain smaller number of waypoints' % (self.eps, n))
+                            'Try increasing the epsilon values to obtain lower number of waypoints' % (self.eps, n))
             self.N = n
             self.dyn_client.update_configuration({'N': self.N})
         
@@ -162,12 +162,14 @@ class SimplifyPath:
         with rosbag.Bag(self.out_bag_fp, 'w') as out_bag:
             for msg in self.new_messages:
                 out_bag.write(self.topic, msg)
+        
+        rospy.loginfo('Done saving new path in %s.' % self.out_bag_fp)
     
     def _promptUser(self):
         print('Press:')
         print('Key <S> or <s>: Save the new path in a bag file.')
-        print('Key <R> or <r>: Re-compute the path.')
-        print('Key <C> or <c>: Select other topic.')
+        print('Key <R> or <r>: Run simplification algorithm.')
+        print('Key <C> or <c>: Select other topic (if any).')
         print('Key <ESC>     : End the node.')
         while 1:
             ch = getch().lower()
@@ -181,9 +183,8 @@ class SimplifyPath:
                 ori_path, ori_messages = self._getOriPath(self._selectTopic())
                 rospy.set_param('/max_N', len(ori_messages))
                 self.ori_path_publisher.publish(ori_path)
-                ch = 'r'
             
-            if ch == 'r':
+            elif ch == 'r':
                 self._updateDynamicParams()
                 self.new_messages = self._compressWaypoints(ori_messages)
                 self.pose_arr.poses = [msg.pose for msg in self.new_messages]

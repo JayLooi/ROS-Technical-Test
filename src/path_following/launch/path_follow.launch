@@ -10,7 +10,6 @@
         <arg name="model" value="$(arg model)"/>
     </include>
     
-    <!--node pkg="path_following" name="robot_params_server" type="reconfig_server.py" args="turtlebot3_$(arg model)" output="screen"/-->
     <node pkg="rqt_gui" name="rqt_gui" type="rqt_gui" args="-s reconfigure"/>
     
     <node pkg="path_following" name="path_follow" type="path_follow.py" output="screen" args="turtlebot3_$(arg model)" required="true">

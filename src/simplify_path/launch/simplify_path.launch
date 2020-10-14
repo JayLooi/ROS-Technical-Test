@@ -1,4 +1,6 @@
 <launch>
+    <arg name="in_bag_fp" default="$(find simplify_path)/bags/path_test.bag"/>
+    <arg name="out_bag_fp" default="$(find simplify_path)/bags/simplified_path.bag"/>
     <!-- dynamic reconfigure server -->
     <node pkg="simplify_path" name="dynamic_reconfig_server" type="reconfig_server.py"/>
     <node pkg="rqt_gui" name="rqt_gui" type="rqt_gui" args="-s reconfigure"/>
