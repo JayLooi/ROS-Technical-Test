@@ -1,0 +1,11 @@
+<launch>
+    <!-- dynamic reconfigure server -->
+    <node pkg="simplify_path" name="dynamic_reconfig_server" type="reconfig_server.py"/>
+    <node pkg="rqt_gui" name="rqt_gui" type="rqt_gui" args="-s reconfigure"/>
+    
+    <!-- Node running algorithm for simplifying recorded waypoints in bag file-->
+    <node pkg="simplify_path" name="simplify_path" type="simplify_path.py" args="$(arg in_bag_fp) $(arg out_bag_fp)" required="true" output="screen"/>
+    
+    <node pkg="simplify_path" name="tf_broadcaster" type="tf_broadcaster.py"/>
+    <node pkg="rviz" name="rviz" type="rviz" args="-d $(find simplify_path)/rviz/simplify_path.rviz"/>
+</launch>
